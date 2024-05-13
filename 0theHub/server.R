@@ -9,6 +9,7 @@ library(htmltools)
 rsconnect::setAccountInfo(name='uocstats', token='0FD5791A9B518FC10240A45703D5EF0C', secret='a/GOl+b02j3gFjgTlW2jEKDm6eM/VFgZkdpy1tVQ')
 
 shinyServer(function(input, output) {
+  bs_themer()
   
   ################################################### 
   # get existing apps as a df   
@@ -25,17 +26,17 @@ shinyServer(function(input, output) {
   ################################################### 
   # generate bulletins with hyper links for completed stat101 sites
   ###################################################   
-  # output$LinksComplete <- renderUI({
-  #   d <- getRawApplications()
-  #   # print(d)
-  #   matches <-  grepl(d$name, pattern = "_Stat101", ignore.case = TRUE)
-  #   d <- d[matches,]
-  #   remove_stat <- substr(d$name,1,nchar(d$name)-8)
-  #   replace_ <- gsub("_", " ", remove_stat)
-  #   tags$ul(
-  #     HTML(paste0("<li><a href=\"", d$url, "\", target=\"_blank\">", replace_, "</a>", collapse = "</li>"))
-  #   )
-  # })
+  output$LinksComplete <- renderUI({
+    d <- getRawApplications()
+    # print(d)
+    matches <-  grepl(d$name, pattern = "_Stat101", ignore.case = TRUE)
+    d <- d[matches,]
+    remove_stat <- substr(d$name,1,nchar(d$name)-8)
+    replace_ <- gsub("_", " ", remove_stat)
+    tags$ul(
+      HTML(paste0("<li><a href=\"", d$url, "\", target=\"_blank\">", replace_, "</a>", collapse = "</li>"))
+    )
+  })
   
   ################################################### 
   # generate bulletins with hyper links for uncompleted stat101 sites
