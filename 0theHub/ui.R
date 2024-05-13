@@ -5,38 +5,67 @@ library(shinythemes)
 library(bslib)
 library(bsicons)
 
+
 card1 <- card(
-  card_header("Scrolling content"),
+  full_screen = TRUE,
+  card_header("Card 1"),
+  markdown("- One 
+                 - Two")
   # "This is it1."
-  lapply(
-    lorem::ipsum(paragraphs = 3, sentences = c(5, 5, 5)),
-    tags$p
-  )
+  # lapply(
+  #   lorem::ipsum(paragraphs = 3, sentences = c(5, 5, 5)),
+  #   tags$p
+  # )
 )
 card2 <- card(
-  card_header("Nothing much here"),
-  "This is it2."
+  full_screen = TRUE,
+  card_header("Card 2"),
+  markdown("- Three 
+                 - Four")
 )
 card3 <- card(
   full_screen = TRUE,
-  card_header("Filling content"),
-  # "This is it3."
-  card_body(
-    class = "p-0",
-    shiny::plotOutput("p")
-  )
+  card_header("Card 3"),
+  markdown("- 5 - 6")
+)
+card4 <- card(
+  full_screen = TRUE,
+  card_header("Card 4"),
+  markdown("- 7 
+                 - 8")
+)
+card5 <- card(
+  full_screen = TRUE,
+  card_header("Card 5"),
+  markdown("- 9 
+                 - 10")
 )
 
-
+card6 <- card(
+  full_screen = TRUE,
+  card_header("Card 6"),
+  markdown("- 11 
+                 - 12")
+)
+# card3 <- card(
+#   full_screen = TRUE,
+#   card_header("Filling content"),
+#   # "This is it3."
+#   card_body(
+#     class = "p-0",
+#     shiny::plotOutput("p")
+#   )
+# )
 
 shinyUI(
 
   layout_column_wrap(
+    theme = bs_theme(bootswatch = "minty"),
+    width = 1/2, height = 300,
+    card1, card2, card3,
     tags$head(
       tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
-    ),
-    width = 1/2, height = 300,
-    card1, card2, card3
+    )
   )
 
   #   anim_width("100%", "67%")

@@ -7,30 +7,9 @@ library(htmltools)
 
 # setAccountInfo(name='uocstats', token='0FD5791A9B518FC10240A45703D5EF0C', secret='a/GOl+b02j3gFjgTlW2jEKDm6eM/VFgZkdpy1tVQ')
 rsconnect::setAccountInfo(name='uocstats', token='0FD5791A9B518FC10240A45703D5EF0C', secret='a/GOl+b02j3gFjgTlW2jEKDm6eM/VFgZkdpy1tVQ')
-shinyServer(function(input, output) {
-  anim_width <- function(x, width1, width2) {
-    x |> tagAppendAttributes(
-      class = "animate-width",
-      style = css(
-        `--width1` = validateCssUnit(width1),
-        `--width2` = validateCssUnit(width2),
-      ),
-    )
-  }
 
-  anim_height <- function(x, height1, height2) {
-    # Wrap in a div fixed at the height of height2, so the rest of
-    # the content on the page doesn't shift up and down
-    div(style = css(height = validateCssUnit(height2)),
-        x |> tagAppendAttributes(
-          class = "animate-height",
-          style = css(
-            `--height1` = validateCssUnit(height1),
-            `--height2` = validateCssUnit(height2),
-          ),
-        )
-    )
-  }
+shinyServer(function(input, output) {
+  
   ################################################### 
   # get existing apps as a df   
   ###################################################  
