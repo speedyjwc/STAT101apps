@@ -9,7 +9,7 @@ library(htmltools)
 rsconnect::setAccountInfo(name='uocstats', token='0FD5791A9B518FC10240A45703D5EF0C', secret='a/GOl+b02j3gFjgTlW2jEKDm6eM/VFgZkdpy1tVQ')
 
 shinyServer(function(input, output) {
-  bs_themer()
+  # bs_themer()
   
   ################################################### 
   # get existing apps as a df   
