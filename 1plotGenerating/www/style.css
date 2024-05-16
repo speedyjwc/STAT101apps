@@ -1,0 +1,35 @@
+@keyframes changewidth {
+  from { width: var(--width1); }
+  25% { width: var(--width1); }
+  50% { width: var(--width2); }
+  75% { width: var(--width2); }
+  to { width: var(--width1); }
+}
+.animate-width {
+  animation-duration: 6s;
+  animation-name: changewidth;
+  animation-iteration-count: infinite;
+  border-right: 2px solid #DDD;
+  padding-right: 1rem;
+  padding-bottom: 3rem;
+}
+
+@keyframes changeheight {
+  from { height: var(--height1); }
+  25% { height: var(--height1); }
+  50% { height: var(--height2); }
+  75% { height: var(--height2); }
+  to { height: var(--height1); }
+}
+.animate-height {
+  height: 600px;
+  animation-duration: var(--anim-duration, 6s);
+  animation-name: changeheight;
+  animation-iteration-count: infinite;
+  padding-bottom: 3rem;
+}
+.shiny-plot-output {
+  background-color: #216B7288;
+  height: 400px;
+  width: 100%;
+}

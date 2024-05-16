@@ -72,7 +72,7 @@ card6 <- card(
 shinyUI(
   
   page_fillable(
-    title = "STAT101 Page",
+    # title = "STAT101 Page",
     theme = bs_theme(bootswatch = "united"),
     fillable_mobile = TRUE,
     
