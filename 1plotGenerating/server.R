@@ -1,6 +1,17 @@
 
 # Define server logic to read selected file ----
 shinyServer(function(input, output, session) {
+  observeEvent(input$isExpand,{
+    accordion_panel_open(id = "sideAcc", values = TRUE)
+  })
+
+  observeEvent(input$isCollapse,{
+    accordion_panel_close(id = "sideAcc", values = TRUE)
+  })
+
+
+
+  
   output$contents <- renderTable({
     # input$file1 will be NULL initially. After the user selects
     # and uploads a file, head of that data file by default,

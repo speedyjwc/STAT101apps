@@ -1,6 +1,7 @@
 library(shiny)
 library(bslib)
 library(bsicons)
+library(shinyWidgets)
 
 # Define UI 
 shinyUI(
@@ -13,13 +14,34 @@ shinyUI(
       
       # Sidebar panel for inputs ----
       sidebar = sidebar(
-        
+
         # Use accordion layout
         accordion(
-          
+          id = "sideAcc",
+          # open = aaaa,
+          layout_columns(
+            col_widths = c(6, 6),
+            actionBttn(
+              inputId = "isExpand",
+              label = "Expand all",
+              style = "float",
+              color = "warning",
+              size = "sm"
+            ),
+            actionBttn(
+              inputId = "isCollapse",
+              label = "Collapse all",
+              style = "float",
+              color = "primary",
+              size = "sm"
+            )
+          ),
+
+
           # accordion 1, upload file
           accordion_panel( 
-            id = NULL,
+            # suppose to use "value" to identify each panel
+            value = "acc_file",
             "Uploading Files",
             icon = bs_icon("upload"),
             # Input: Select a file ----
@@ -33,6 +55,7 @@ shinyUI(
                 ".csv"
               )
             ),
+ 
             
             # # Horizontal line ----
             # tags$hr(),
@@ -78,19 +101,19 @@ shinyUI(
             #   selected = "head"
             # )
           ),
-          
+
           # accordion 2, variable selection
           accordion_panel(
-            id = NULL,
+            value = "acc_var",
             icon = bs_icon("hand-index-thumb"),
             "Variable selection",
             open = FALSE,
             "Choose the variable for visualisiation"
           ),
           
-          # accordion 3, variable selection
+          # accordion 3, plot customise
           accordion_panel(
-            id = NULL,
+            value = "acc_plot",
             icon = bs_icon("palette"),
             "Plot editting",
             open = FALSE,
@@ -103,10 +126,11 @@ shinyUI(
       navset_pill(
         # title for each panel was too long for tab/pill, generate a menu to host them
         nav_menu(
-          title = "Select variable number and type ",
+          title = "Select the number of variable and the type",
           nav_panel(title = "One Quantitative Variable", 
                     icon = bs_icon("1-circle-fill"),
                     p("First tab content."),
+                    verbatimTextOutput("test"),
                     
                     navset_card_pill(
                       placement = "above",
@@ -163,7 +187,14 @@ shinyUI(
                     p("Two Quantitative Variables content")),
         ),
         nav_spacer(),
-        nav_item(img(src="UoC.png", style="aspect-ratio: auto; max-height: 60px"))
+        nav_item(img(src="UoC.png", style="aspect-ratio: auto; max-height: 60px")),
+        nav_menu(
+          title = "Other sites",
+          nav_item("    Sampling"),
+          nav_item("    Bootstrap"),
+          nav_item("    Randomisation"),
+          nav_item("    ...")
+        )
         
       ),
       
