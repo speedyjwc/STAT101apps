@@ -18,14 +18,13 @@ shinyUI(
         # Use accordion layout
         accordion(
           id = "sideAcc",
-          # open = aaaa,
           layout_columns(
             col_widths = c(6, 6),
             actionBttn(
               inputId = "isExpand",
               label = "Expand all",
               style = "float",
-              color = "warning",
+              color = "primary",
               size = "sm"
             ),
             actionBttn(
@@ -136,9 +135,10 @@ shinyUI(
                       placement = "above",
                       nav_panel(
                         title = "Raw data",
-                        p("datatable content."),
-                        #             # Output: Data file ----
-                        tableOutput("contents")),
+                        h4("upload a csv file and select a numerical variable"),
+                        br(),
+                        # Output: Data file ----
+                        dataTableOutput("contents_raw")),
                       nav_panel(
                         
                         title = "Vis1",
