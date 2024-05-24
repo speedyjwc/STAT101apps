@@ -1,4 +1,12 @@
-
+library(shiny)
+library(bslib)
+library(bsicons)
+library(shinyWidgets)
+library(DT)
+library(colourpicker)
+library(plotly)
+library(tidyverse)
+library(shinyjs)
 # Define server logic to read selected file ----
 shinyServer(function(input, output, session) {
   
@@ -10,6 +18,9 @@ shinyServer(function(input, output, session) {
   observeEvent(input$isCollapse,{
     accordion_panel_close(id = "sideAcc", values = TRUE)
   })
+  
+
+  
   
   # raw data frame after the csv is uploaded
   df_raw <- reactive({
@@ -30,6 +41,18 @@ shinyServer(function(input, output, session) {
     )
     return(df)
   })
+  
+  # display a message if user has not upload a file
+  output$messageBox1 <- renderText({
+    "Upload a csv file and select a numerical variable!"
+  })
+
+  # make messageBox1 disappear once the file is uploaded
+  observe({
+    toggleElement(id = "messageBox1",
+           condition = is.null(input$file1))
+  })
+  
   
   # display raw data as DT
   output$contents_raw <- renderDataTable(
@@ -119,7 +142,10 @@ shinyServer(function(input, output, session) {
   })
   
   
-  
+  # output$test <- renderPrint({
+  #   is.null(input$file1)
+  # 
+  # })
   
 })
 

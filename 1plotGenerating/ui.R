@@ -4,18 +4,21 @@ library(bsicons)
 library(shinyWidgets)
 library(DT)
 library(colourpicker)
+library(plotly)
+library(shinyjs)
 
 # Define UI 
 shinyUI(
+  
   tags$head(
     
     page_fillable(
       padding = 0,
-     
+      
       theme = bs_theme(version = 5,
                        bootswatch = "united",
-      #                  # "accordion-title-color" = "green",
-      #                  heading_font = font_google("Josefin Slab")
+                       #                  # "accordion-title-color" = "green",
+                       #                  heading_font = font_google("Josefin Slab")
       ),
       
       # ?alternative way to customise the accordion titles
@@ -23,7 +26,7 @@ shinyUI(
         ".accordion-title{
                           /*customise the title font style(bold, font family and italic)*/
                           /*color: green;*/
-                          font-weight: 1000;
+                          font-weight: 900;
                           font-style: italic;
                           font-family: 'Josefin Slab', 'Courier New', monospace;
                           /*add a green underline*/
@@ -31,8 +34,8 @@ shinyUI(
                           text-decoration-color: green;  
                                  }
                ")),
-     
-      
+      # allows the toggleElement to work
+      useShinyjs(),
       # sidebar for all types/numbers of variable
       layout_sidebar(
         
@@ -66,7 +69,7 @@ shinyUI(
             accordion_panel( 
               # suppose to use "value" to identify each panel
               value = "acc_file",
-              "Uploading Files",
+              "Upload File",
               icon = bs_icon("upload"),
               # Input: Select a file ----
               fileInput(
@@ -160,7 +163,7 @@ shinyUI(
                 open = FALSE,
                 "Customise the plot",
                 actionButton("updatePlotButton", "Update Plot", icon("refresh")),
-                colourInput(inputId = "colBox", 
+                colourpicker::colourInput(inputId = "colBox", 
                             label = "Select colour to fill the box", 
                             value = "salmon"),
                 hr(),
@@ -186,36 +189,46 @@ shinyUI(
             nav_panel(title = "One Quantitative Variable", 
                       icon = bs_icon("1-circle-fill"),
                       
-                      p("One Quantitative variable."),
-                      verbatimTextOutput("test"),
-                      
+                      # p("One Quantitative variable."),
+                      # verbatimTextOutput("test"),
+
                       navset_card_pill(
                         placement = "above",
                         full_screen = TRUE,
                         nav_panel(
                           title = "Raw data",
-                          h4("upload a csv file and select a numerical variable"),
+                          textOutput("messageBox1"),
+                          tags$head(tags$style(
+                            "#messageBox1{
+                        color: salmon;
+                        font-size: 20px;
+                        font-style: italic;}"
+                          )
+                          ),
+
                           br(),
                           # Output: Data file ----
                           DT::DTOutput("contents_raw")
                         ),
                         nav_panel(
-                          
-                          title = "Vis1",
+                          title = "Boxplot",
                           p("plot 1 content."),
                           br(),
                           plotlyOutput("boxPlot")
                         ),
-                        nav_panel(title = "Vis2", 
+                        nav_panel(title = "Histogram", 
                                   p("plot 2 content.")),
-                        nav_panel(title = "Vis3", 
+                        nav_panel(title = "Dotplot", 
                                   p("plot 3 content.")),
                         
                         nav_panel(title = "Summary", 
                                   # combined in datatable tab?
                                   p("Summary statistic content")),
                         nav_spacer(),
-                        nav_item("One Quantitative Variable"),
+                        nav_item(
+                          p(style = "font-weight: 700; font-size: 25px;", "One Quantitative Variable")
+                      
+                                 ),
                         
                         
                         
@@ -282,4 +295,3 @@ shinyUI(
     
   )
 )
-  
