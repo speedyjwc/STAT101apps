@@ -42,10 +42,9 @@ shinyUI(
         # Sidebar panel for inputs ----
         sidebar = sidebar(
           
-          
           # Use accordion layout
           accordion(
-            id = "sideAcc",
+            id = "sideAccordion",
             layout_columns(
               col_widths = c(6, 6),
               actionBttn(
@@ -74,7 +73,7 @@ shinyUI(
               # Input: Select a file ----
               fileInput(
                 "file1",
-                "Choose CSV File",
+                "Choose CSV File:",
                 multiple = TRUE,
                 accept = c(
                   "text/csv",
@@ -93,7 +92,7 @@ shinyUI(
               # Input: Select separator ----
               radioButtons(
                 "sep",
-                "Separator",
+                "Separator:",
                 choices = c(
                   Comma = ",",
                   Semicolon = ";",
@@ -105,7 +104,7 @@ shinyUI(
               # Input: Select quotes ----
               radioButtons(
                 "quote",
-                "Quote",
+                "Quote:",
                 choices = c(
                   None = "",
                   "Double Quote" = '"',
@@ -131,50 +130,83 @@ shinyUI(
             
             # accordion 2, variable selection
             accordion_panel(
-              value = "acc_var",
-              icon = bs_icon("hand-index-thumb"),
-              "Variable selection",
+              value = "acc_boxplot_setting",
+              icon = bs_icon("brush"), #"hand-index-thumb"
+              "Plot Settings",
               open = FALSE,
               pickerInput(
                 inputId = "num1",
-                label = "Choose a numerical variable", 
+                label = "Choose a numerical variable:", 
                 choices = "Upload the csv file first",
                 options = list(
                   `live-search` = TRUE,
                   size = 5)
               ),
-              # actionButton("generatePlotButton", "Generate Plot", icon("refresh")),
-              actionBttn(
-                inputId = "generatePlotButton",
-                label = "Generate Plot",
-                style = "unite", 
-                # color = "danger"
-              )
-            ),
-            
-            # accordion 3, plot customise
-            conditionalPanel(
-              condition = "input.generatePlotButton > 0 & input.num1 != 'Upload the csv file first'",
               
-              accordion_panel(
-                value = "acc_plot",
-                icon = bs_icon("palette"),
-                "Plot editting",
-                open = FALSE,
-                "Customise the plot",
-                actionButton("updatePlotButton", "Update Plot", icon("refresh")),
-                colourpicker::colourInput(inputId = "colBox", 
-                            label = "Select colour to fill the box", 
-                            value = "salmon"),
+              conditionalPanel(
+                condition = "input.num1 != 'Upload the csv file first'",
                 hr(),
-                h4("Customised Labeling:"),
+                p("Customised Labeling:"),
                 textInput("titleBox", label = "Title:  ", " "),
                 # x axis
                 textInput(inputId = "xLabBox", 
                           label = "X Label:", 
                           value = "X axis is..."),
                 # y axis
-                textInput("yLabBox", "Y Label:", " ")
+                textInput("yLabBox", "Y Label:", " "),
+                hr(),
+                colourpicker::colourInput(inputId = "colFill", 
+                                          label = "Color for the filling:", 
+                                          value = "salmon"),
+                
+                colourpicker::colourInput(inputId = "colBackground", 
+                                          label = "Colour for the backbround:", 
+                                          value = '#e5ecf6'),
+                colourpicker::colourInput(inputId = "colLine", 
+                                          label = "Color for the line:", 
+                                          value = 'black'),
+                hr(),
+                awesomeCheckboxGroup(
+                  inputId = "grids",
+                  label = "Show Grids on: ", 
+                  choices = c("X", "Y"),
+                  selected = "X",
+                  inline = TRUE
+                  # status = "danger"
+                ),
+                hr(),
+                radioGroupButtons(
+                  inputId = "num1orientation",
+                  label = "Select layout orientation:",
+                  choices = c("-H", 
+                              "|V"),
+                  checkIcon = list(
+                    yes = icon("ok",
+                               lib = "glyphicon"))
+                ),
+                hr(),
+                numericInput(
+                  inputId = "plotWidth",
+                  label = "Plot width in pixel:",
+                  value = NA,
+                  min = 100,
+                  step = 1
+                ),
+                numericInput(
+                  inputId = "plotHeight",
+                  label = "Plot height in pixel:",
+                  value = 400,
+                  min = 100,
+                  step = 1
+                ),
+                hr(),
+                prettyCheckbox(
+                  inputId = "num1ShowMean",
+                  label = "Show mean", 
+                  value = TRUE,
+                  status = "danger",
+                  shape = "curve"
+                )
               )
             )
           )
@@ -191,7 +223,7 @@ shinyUI(
                       
                       # p("One Quantitative variable."),
                       # verbatimTextOutput("test"),
-
+                      
                       navset_card_pill(
                         placement = "above",
                         full_screen = TRUE,
@@ -200,21 +232,39 @@ shinyUI(
                           textOutput("messageBox1"),
                           tags$head(tags$style(
                             "#messageBox1{
-                        color: salmon;
+                        color: black;
                         font-size: 20px;
                         font-style: italic;}"
                           )
                           ),
-
+                          
                           br(),
                           # Output: Data file ----
                           DT::DTOutput("contents_raw")
                         ),
                         nav_panel(
                           title = "Boxplot",
-                          p("plot 1 content."),
-                          br(),
-                          plotlyOutput("boxPlot")
+                            layout_columns(
+                              col_widths = 3,
+                              actionButton("updateBoxPlotButton", 
+                                           "Update Plot", 
+                                           icon("list-check"),
+                                           # width = "20%"
+                              ),
+                              actionButton("resetBoxPlotButton", 
+                                           "Default settings", 
+                                           icon("refresh"),
+                                           # width = "20%"
+                              ),
+                            ),
+                            # p("plot 1 content."),
+                            br(),
+                            div(
+                              plotlyOutput("boxPlot"),
+                              align = "center"
+                            )
+                          
+                          
                         ),
                         nav_panel(title = "Histogram", 
                                   p("plot 2 content.")),
@@ -227,8 +277,8 @@ shinyUI(
                         nav_spacer(),
                         nav_item(
                           p(style = "font-weight: 700; font-size: 25px;", "One Quantitative Variable")
-                      
-                                 ),
+                          
+                        ),
                         
                         
                         

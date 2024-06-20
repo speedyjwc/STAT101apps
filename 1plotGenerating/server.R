@@ -10,18 +10,19 @@ library(shinyjs)
 # Define server logic to read selected file ----
 shinyServer(function(input, output, session) {
   
+  ### accordions behaviour
   # buttons that control expand/collapse all accordions
   observeEvent(input$isExpand,{
-    accordion_panel_open(id = "sideAcc", values = TRUE)
+    accordion_panel_open(id = "sideAccordion", values = TRUE)
   })
-
+  
   observeEvent(input$isCollapse,{
-    accordion_panel_close(id = "sideAcc", values = TRUE)
+    accordion_panel_close(id = "sideAccordion", values = TRUE)
   })
   
-
   
   
+  ### once file is uploaded
   # raw data frame after the csv is uploaded
   df_raw <- reactive({
     req(input$file1)
@@ -29,10 +30,10 @@ shinyServer(function(input, output, session) {
       {
         df <- read.csv(
           input$file1$datapath,
-                       header = input$header,
-                       sep = input$sep,
-                       quote = input$quote
-                       )
+          header = input$header,
+          sep = input$sep,
+          quote = input$quote
+        )
       },
       error = function(e) {
         # return a safeError if a parsing error occurs
@@ -46,13 +47,12 @@ shinyServer(function(input, output, session) {
   output$messageBox1 <- renderText({
     "Upload a csv file and select a numerical variable!"
   })
-
+  
   # make messageBox1 disappear once the file is uploaded
   observe({
     toggleElement(id = "messageBox1",
-           condition = is.null(input$file1))
+                  condition = is.null(input$file1))
   })
-  
   
   # display raw data as DT
   output$contents_raw <- renderDataTable(
@@ -61,7 +61,7 @@ shinyServer(function(input, output, session) {
     # ,selection = list(mode = 'single', target = 'column'))
   )
   
-  # update the dropdown input for varaible selection
+  # update the dropdown input for variable selection
   observe ({
     df_num <- df_raw() %>%
       # only keep the numeric variable (potential issue?)
@@ -71,8 +71,9 @@ shinyServer(function(input, output, session) {
     
   })
   
+  ## updateplotButton behaviours
   # store the x-axis label value when update button is clicked
-  xLabBox <- eventReactive(input$updatePlotButton, {
+  xLabBox <- eventReactive(input$updateBoxPlotButton, {
     input$xLabBox
   })
   
@@ -80,56 +81,119 @@ shinyServer(function(input, output, session) {
     updateTextInput(session, inputId = "xLabBox", value = input$num1)
   })
   
-  observe({
-    updateTextInput(session, inputId = "generatePlotButton", value = input$num1)
-    
-  })
-  
   # store the y-axis label value when update button is clicked
-  yLabBox <- eventReactive(input$updatePlotButton, {
+  yLabBox <- eventReactive(input$updateBoxPlotButton, {
     input$yLabBox
   })
   
   # store the title value when update button is clicked
-  titleBox <- eventReactive(input$updatePlotButton, {
+  titleBox <- eventReactive(input$updateBoxPlotButton, {
     input$titleBox
   })
   
-  boxplot <- reactive({
+  # store the plot width value when update button is clicked  
+  plotWidth <- eventReactive(input$updateBoxPlotButton, {
+    input$plotWidth
+  })
+  
+  # store the plot height value when update button is clicked  
+  plotHeight <- eventReactive(input$updateBoxPlotButton, {
+    input$plotHeight
+  })
+  
+  
+  
+  ## reset button behaviours
+  observeEvent(input$resetBoxPlotButton, {
+    colourpicker::updateColourInput(session, "colFill", value = "salmon")
+    colourpicker::updateColourInput(session, "colBackground", value = "#e5ecf6")
+    colourpicker::updateColourInput(session, "colBackLine", value = "black")
+    updateTextInput(session, "titleBox", value = " ")
+    updateTextInput(session, "xLabBox", value = input$num1)
+    updateTextInput(session, "yLabBox", value = " ")
+    updateNumericInput(session, "plotHeight", value = 400)
+    updateNumericInput(session, "plotWidth", value = NA)
+    updateAwesomeCheckboxGroup(session, "grids", selected = "X")
+    updateRadioGroupButtons(session, "num1orientation", selected = "-H",)
+    updatePrettyCheckbox(session, "num1ShowMean", value = TRUE)
+  })
+  
+  
+  ## draw the box plot
+  boxplot <- eventReactive(input$updateBoxPlotButton, {
     df = df_raw()[c(input$num1)]
     
-    # p <- ggplot(df_sub(), aes_string(y = names(df_sub())[1], x = 0)) + 
-    p <- ggplot(df, aes_string(y = input$num1, x = 0)) + 
-      geom_boxplot() +
-      coord_flip()
+    xyValues <- if(input$num1orientation != "|V"){
+      # horizontal settings
+      list(boxX = df[,1], 
+           meanX = mean(df[,1],na.rm = TRUE),
+           boxY = input$num1,
+           meanY = input$num1,
+           info = "x")
+    } else {
+      # vertical settings
+      list(boxX = input$num1,
+           meanX = input$num1,
+           boxY = df[,1], 
+           meanY = mean(df[,1],na.rm = TRUE),
+           info = "y"
+      )
+    }
     
     
-    fig <- plotly_build(p)
-    
-    fig$x$data[[1]]$fillcolor <- input$colBox
-    
-    fig$x$data[[1]]$marker$opacity <- 0.5
-    
-    boxOutput <- fig %>% 
-      hide_colorbar() %>% 
-      add_trace(x = mean(df[,1],na.rm = TRUE), y=0, 
-                type = "scatter", mode = "marker",
-                marker = list(symbol = "x",
-                              size = 10,
-                              color = "deepskyblue"),
-                hoverinfo = "text",
-                text = ~paste("Mean: ",round(mean(df[,1],na.rm = TRUE),2), sep="")) %>% 
-      layout(plot_bgcolor='#e5ecf6',
+    boxOutput <-  plot_ly(type = "box", 
+                          width = plotWidth(), 
+                          height = plotHeight()) %>% 
+      # the box
+      add_boxplot(x = xyValues$boxX, 
+                  # can without a y value for the box itself, but with it can be helpful for the mean point
+                  y = xyValues$boxY,
+                  boxpoints = 'outliers',
+                  jitter = 0.5,
+                  pointpos = 0,
+                  line = list(color = input$colLine),
+                  fillcolor = input$colFill,
+                  quartilemethod = tolower(input$num1BoxAlgorithm),
+                  showlegend = FALSE,
+                  # to scrap off the "trace 0" tag
+                  hoverinfo = xyValues$info
+                  
+      )%>% 
+      # hide_colorbar() %>% 
+      # add the mean as a cross
+      {if(input$num1ShowMean){
+        add_trace(., x = xyValues$meanX,  
+                  # need to set the y value to make this point overlay on the box
+                  y = xyValues$meanY,
+                  type = "scatter", mode = "marker",
+                  marker = list(symbol = "x",
+                                size = 10,
+                                color = "deepskyblue"),
+                  showlegend = FALSE,
+                  hoverinfo = "text",
+                  text = ~paste("Mean: ",round(mean(df[,1],na.rm = TRUE),2), sep="")
+        )} else {.}
+      } %>% 
+      layout(plot_bgcolor= input$colBackground, #'#e5ecf6',
              title = titleBox(),
              xaxis = list(title = xLabBox(),
-                          gridcolor = 'ffff'
+                          showgrid = "X" %in% input$grids,
+                          gridcolor = 'ffff',
+                          showticklabels = input$num1orientation == "-H"
              ),
              yaxis = list(gridcolor = 'ffff',
-                          showgrid = F,
+                          showgrid = "Y" %in% input$grids,
                           title = yLabBox(),
                           ticklen = 0,
-                          showticklabels=FALSE
-             ) 
+                          showticklabels = input$num1orientation == "|V"
+             ),
+             margin = list(
+               l = 50,
+               r = 50,
+               b = 50,
+               t = 75,
+               pad = 20
+             )
       )%>%
       config(modeBarButtons = list(list("toImage")),
              displaylogo = FALSE)
@@ -143,7 +207,7 @@ shinyServer(function(input, output, session) {
   
   
   # output$test <- renderPrint({
-  #   is.null(input$file1)
+  #   input$num1BoxGrids
   # 
   # })
   

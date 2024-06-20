@@ -1,0 +1,136 @@
+---
+title: "unused codes"
+output: html_document
+date: "2024-06-19"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+unused code in the STAT101 apps
+
+
+# one numerical vairiable
+
+## boxplot using ggplot
+was to draw with ggplot, then `plotly_build(p)`
+```{r}
+# in shiny server.r
+boxplot <- eventReactive(input$updateBoxPlotButton, {
+  df = df_raw()[c(input$num1)]
+  
+  # p <- ggplot(df_sub(), aes_string(y = names(df_sub())[1], x = 0)) +
+  p <- ggplot(df, aes_string(y = input$num1, x = 0)) +
+    # geom_jitter(shape = 18, alpha = 0.5, color = "black", fill = "grey", width = 0.25) +
+    geom_boxplot() +
+    coord_flip()
+  
+  
+  fig <- plotly_build(p)
+  fig$x$data[[1]]$marker$opacity <- 0.5
+  ## customise the boxplot settings:
+  # if boxplot comes later after the jitters, then use data[[2]]
+  # if the boxplot is the first layer, then data[[1]]
+  fig$x$data[[1]]$fillcolor <- input$colBoxFill
+  fig$x$data[[1]]$line$color <- input$colBoxLine
+  
+  
+  boxOutput <-  plot_ly(type = "box") %>% 
+    hide_colorbar() %>% 
+    add_trace(x = mean(df[,1],na.rm = TRUE),  y = 0,
+              type = "scatter", mode = "marker",
+              marker = list(symbol = "x",
+                            size = 10,
+                            color = "deepskyblue"),
+              hoverinfo = "text",
+              text = ~paste("Mean: ",round(mean(df[,1],na.rm = TRUE),2), sep="")) %>% 
+    layout(plot_bgcolor= input$colBackground, #'#e5ecf6',
+    title = titleBox(),
+    xaxis = list(title = xLabBox(),
+                 showgrid = T,
+                 gridcolor = 'ffff',
+                 automargin = TRUE
+    ),
+    yaxis = list(gridcolor = 'ffff',
+                 showgrid = T,
+                 title = yLabBox(),
+                 ticklen = 0,
+                 showticklabels=TRUE,
+                 automargin = TRUE
+    ),
+    margin = list(
+      l = 50,
+      r = 25,
+      b = 25,
+      t = 75,
+      pad = 20
+    )
+    )%>%
+    config(modeBarButtons = list(list("toImage")),
+           displaylogo = FALSE)
+  
+  return(boxOutput)
+})
+
+output$boxPlot <- renderPlotly({
+  boxplot()
+})
+
+
+```
+
+## quartiles algorithm
+```{r}
+# in ui.r
+radioGroupButtons(
+  inputId = "num1BoxAlgorithm",
+  label = "Quartiles Algorithm:",
+  choices = c("Linear", 
+              "Inclusive", 
+              "Exclusive"),
+  status = "primary",
+  checkIcon = list(
+    yes = icon("ok", 
+               lib = "glyphicon"),
+    no = icon("remove",
+              lib = "glyphicon"))
+)
+
+# in server.r
+# boxOutput <-  plot_ly(type = "box") %>% 
+#   # the box
+#   add_boxplot(x = ~df[,1], 
+#               # can without a y value for the box itself, but with it can be helpful for the mean point
+#               y = input$num1,
+#               boxpoints = 'outliers',
+#               jitter = 0.5,
+#               pointpos = 0,
+#               line = list(color = input$colBoxLine),
+#               fillcolor = input$colBoxFill,
+              quartilemethod = tolower(input$num1BoxAlgorithm),
+  #             showlegend = FALSE,
+  #             # to scrap off the "trace 0" tag
+  #             hoverinfo = 'x'
+  # )%>% ......
+  
+
+```
+
+
+```{r}
+library(plotly)
+fig <- plot_ly(x = ~rnorm(50), type = "box")
+fig <- fig %>% add_trace(x = ~rnorm(50, 1)
+                         )
+
+fig
+```
+
+
+
+
+
+
+
+
