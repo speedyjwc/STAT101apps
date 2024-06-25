@@ -108,23 +108,104 @@ radioGroupButtons(
 #               pointpos = 0,
 #               line = list(color = input$colBoxLine),
 #               fillcolor = input$colBoxFill,
-              quartilemethod = tolower(input$num1BoxAlgorithm),
-  #             showlegend = FALSE,
-  #             # to scrap off the "trace 0" tag
-  #             hoverinfo = 'x'
-  # )%>% ......
-  
+quartilemethod = tolower(input$num1BoxAlgorithm),
+#             showlegend = FALSE,
+#             # to scrap off the "trace 0" tag
+#             hoverinfo = 'x'
+# )%>% ......
+
 
 ```
 
 
 ```{r}
-library(plotly)
-fig <- plot_ly(x = ~rnorm(50), type = "box")
-fig <- fig %>% add_trace(x = ~rnorm(50, 1)
-                         )
+df = mtcars
+#using ggplot, user can set the bin numbers as they wish but sometimes the bin is not algined to the ticks well
 
-fig
+# range = range(df_sub(), na.rm = TRUE)
+#
+# binWidth = (range[2]-range[1])/(input$binNums-1)
+
+axisMin = min(df[,1])
+axisMax = max(df[,1])
+histStep = 10^(floor(
+  log10(
+    axisMax - axisMin
+    # max(df,na.rm = TRUE)-
+    #   min(df,na.rm = TRUE)
+  )
+)-1)
+
+histBinNums <- 10
+# 
+# axisEnd = ceiling(max(df,na.rm = TRUE)/histStep)*histStep
+# axisStart = floor(min(df,na.rm = TRUE)/histStep)*histStep
+axisEnd = ceiling(axisMax/histStep)*histStep
+axisStart = floor(axisMin/histStep)*histStep
+
+hist <- ggplot(data = df, mapping = aes_string(x = names(df)[1])) +
+  geom_histogram( breaks = seq(axisStart, axisEnd, length.out = histBinNums+1),
+                  # bins = input$binNums,
+                  fill = "salmon", color = "black") +
+  theme(
+    plot.margin = margin(0.7, 0.2, 0.2, 0.2, "cm"),
+    panel.grid=element_blank()
+  )
+hist
+
+# +
+#     scale_x_continuous(
+#         breaks = round(seq(range[1]-binWidth/2, range[2]-binWidth/2,by = binWidth)),
+#         labels = round(seq(range[1], range[2], by = binWidth), 1),
+#         guide = guide_axis(check.overlap = TRUE))
+
+aa <- ggplotly(hist)
+axisSeq <- seq(min(aa$x$data[[1]]$x-aa$x$data[[1]]$width/2),
+               max(aa$x$data[[1]]$x+aa$x$data[[1]]$width/2),
+               by = max(round(histBinNums/10),1)*aa$x$data[[1]]$width[1])
+
+plotHist <- aa %>%
+  style(hoverinfo = 'none') %>%
+  add_trace(x=aa$x$data[[1]]$x,
+            y=aa$x$data[[1]]$y,
+            color = "salmon", #I(input$colFill),
+            alpha = 0.01,
+            type = 'bar',
+            text = paste0(
+              "range: (", round(aa$x$data[[1]]$x-aa$x$data[[1]]$width/2, 2), ", ",
+              round(aa$x$data[[1]]$x+aa$x$data[[1]]$width/2, 2), "]", 
+              "<br>frequency: ", aa$x$data[[1]]$y
+              # "lower bound: ", round(aa$x$data[[1]]$x-aa$x$data[[1]]$width/2, 2),
+              # "<br>upper bound: ", round(aa$x$data[[1]]$x+aa$x$data[[1]]$width/2, 2),
+              # "<br>frequency: ", aa$x$data[[1]]$y
+            ),
+            hoverinfo="text") %>%
+  layout(plot_bgcolor = '#e5ecf6',
+  title = "titleHist()",
+  xaxis = list(
+    title = "xLabHist()",
+    ticks="inside",
+    ticktext = round(axisSeq,1),
+    tickvals = axisSeq,
+    tickmode = "array",
+    tickangle = 45,
+    showgrid = T,
+    gridcolor = 'ffff'
+  ),
+  yaxis = list(
+    title = "yLabHist()",
+    gridcolor = 'ffff',
+    showgrid = T,
+    title = "Frequency",
+    ticktext = round(seq(0, max(aa$x$data[[1]]$y),length.out = 6)),
+    tickvals = seq(0, max(aa$x$data[[1]]$y),length.out = 6),
+    tickmode = "array")
+  ) %>%
+  config(modeBarButtons = list(list("toImage")),
+         displaylogo = FALSE)
+
+plotHist$width
+aa$width
 ```
 
 
