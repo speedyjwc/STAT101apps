@@ -8,11 +8,11 @@ library(bsicons)
 
 card1 <- card(
   full_screen = TRUE,
-  card_header(class = "bg-primary", "Card 1"),
+  card_header(class = "bg-primary", "Descriptive Statistics and Plot Generators"),
   card_body(#class = "text-primary",
     withSpinner(
-      htmlOutput("LinksComplete", style = "font-size: 20px;")
-    )
+      htmlOutput("LinksTemp", style = "font-size: 20px;")
+    ),
   )
   # "This is it1."
   # lapply(
@@ -49,14 +49,16 @@ card5 <- card(
 
 card6 <- card(
   full_screen = TRUE,
-  card_header( "Card 6" #class = "bg-danger",
+  card_header( "Others" #class = "bg-danger",
                ),
   # card_image(
   #   file = "www/UoC.png",
   #   href = "https://github.com/rstudio/shiny"
   # ),
-  markdown("- 11
-                 - 12")
+  withSpinner(
+    htmlOutput("LinksComplete", style = "font-size: 20px;")
+  ),
+  markdown("- and more")
 )
 # card3 <- card(
 #   full_screen = TRUE,
@@ -72,7 +74,7 @@ card6 <- card(
 shinyUI(
   
   page_fillable(
-    # title = "STAT101 Page",
+    # title = "STAT101 Pages Hub",
     theme = bs_theme(bootswatch = "united"),
     fillable_mobile = TRUE,
     
@@ -80,7 +82,7 @@ shinyUI(
       # theme = bs_theme(bootswatch = "united"),
       width = 1/2, fill = TRUE,
       fillable = FALSE,
-      headerPanel("STAT101 Page"),
+      headerPanel("STAT101 Pages Hub"),
       img(src="UoC.png", align="right", style="aspect-ratio: auto; max-height: 60px"),
       
     ),

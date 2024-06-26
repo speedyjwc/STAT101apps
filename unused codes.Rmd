@@ -163,6 +163,18 @@ aa <- ggplotly(hist)
 axisSeq <- seq(min(aa$x$data[[1]]$x-aa$x$data[[1]]$width/2),
                max(aa$x$data[[1]]$x+aa$x$data[[1]]$width/2),
                by = max(round(histBinNums/10),1)*aa$x$data[[1]]$width[1])
+vline <- function(x = 0, color = "green") {
+  list(
+    type = "line",
+    y0 = 0,
+    y1 = 1,
+    yref = "container",
+    x0 = x,
+    x1 = x,
+    line = list(color = color, dash="dot")
+  )
+}
+
 
 plotHist <- aa %>%
   style(hoverinfo = 'none') %>%
@@ -172,6 +184,7 @@ plotHist <- aa %>%
             alpha = 0.01,
             type = 'bar',
             text = paste0(
+              "Bin #:", which(aa$x$data[[1]]$x %in% aa$x$data[[1]]$x), 
               "range: (", round(aa$x$data[[1]]$x-aa$x$data[[1]]$width/2, 2), ", ",
               round(aa$x$data[[1]]$x+aa$x$data[[1]]$width/2, 2), "]", 
               "<br>frequency: ", aa$x$data[[1]]$y
@@ -180,32 +193,35 @@ plotHist <- aa %>%
               # "<br>frequency: ", aa$x$data[[1]]$y
             ),
             hoverinfo="text") %>%
+  add_segments(x = 14, xend = 14, y = 0, yend = max(aa$x$data[[1]]$y)) %>% 
   layout(plot_bgcolor = '#e5ecf6',
-  title = "titleHist()",
-  xaxis = list(
-    title = "xLabHist()",
-    ticks="inside",
-    ticktext = round(axisSeq,1),
-    tickvals = axisSeq,
-    tickmode = "array",
-    tickangle = 45,
-    showgrid = T,
-    gridcolor = 'ffff'
-  ),
-  yaxis = list(
-    title = "yLabHist()",
-    gridcolor = 'ffff',
-    showgrid = T,
-    title = "Frequency",
-    ticktext = round(seq(0, max(aa$x$data[[1]]$y),length.out = 6)),
-    tickvals = seq(0, max(aa$x$data[[1]]$y),length.out = 6),
-    tickmode = "array")
+         title = "titleHist()",
+         # shapes = list(type='line', x0= 20, x1= 20, y0=0, y1=1, line=list(dash='dot', width=1)),
+         xaxis = list(
+           title = "xLabHist()",
+           ticks="inside",
+           ticktext = round(axisSeq,1),
+           tickvals = axisSeq,
+           tickmode = "array",
+           tickangle = 45,
+           showgrid = T,
+           gridcolor = 'ffff'
+         ),
+         yaxis = list(
+           title = "yLabHist()",
+           gridcolor = 'ffff',
+           showgrid = T,
+           title = "Frequency",
+           ticktext = round(seq(0, max(aa$x$data[[1]]$y),length.out = 6)),
+           tickvals = seq(0, max(aa$x$data[[1]]$y),length.out = 6),
+           tickmode = "array")
   ) %>%
   config(modeBarButtons = list(list("toImage")),
          displaylogo = FALSE)
+which(aa$x$data[[1]]$x %in% aa$x$data[[1]]$x)
 
-plotHist$width
-aa$width
+aa$x$data[[1]]$x
+plotHist
 ```
 
 

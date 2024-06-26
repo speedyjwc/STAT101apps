@@ -7,6 +7,7 @@ library(colourpicker)
 library(plotly)
 library(tidyverse)
 library(shinyjs)
+library(shinyalert)
 # Define server logic to read selected file ----
 shinyServer(function(input, output, session) {
   
@@ -295,12 +296,26 @@ shinyServer(function(input, output, session) {
                        value = xmax())
   })
   
+  
+  observeEvent(input$updateHistPlotButton, {
+    req(input$xminHist,input$xmaxHist)  # Ensure both inputs are available
+    
+    if (input$xminHist >= input$xmaxHist) {
+      shinyalert(
+        title = "Warning",
+        text = "The minimum value should be smaller than the maximum.",
+        type = "warning",
+        size = "xs"
+      )
+    }
+  })
+  
   # default settings button for histogram:
   observeEvent(input$resetHistPlotButton, {
     # universal one num settings
     colourpicker::updateColourInput(session, "colFill", value = "salmon")
     colourpicker::updateColourInput(session, "colBackground", value = "#e5ecf6")
-    colourpicker::updateColourInput(session, "colBackLine", value = "black")
+    colourpicker::updateColourInput(session, "colLine", value = "black")
     updateTextInput(session, "titleBox", value = " ")
     updateTextInput(session, "xLabBox", value = input$num1)
     updateTextInput(session, "yLabBox", value = " ")
@@ -348,6 +363,8 @@ shinyServer(function(input, output, session) {
       axisStart = axisMin
     }
     
+    meanX = mean(df[,1],na.rm = TRUE)
+    
     hist <- ggplot(data = df, mapping = aes_string(x = names(df)[1])) +
       geom_histogram( breaks = seq(
         axisStart, axisEnd, 
@@ -368,19 +385,32 @@ shinyServer(function(input, output, session) {
       style(hoverinfo = 'none') %>%
       add_trace(x=aa$x$data[[1]]$x,
                 y=aa$x$data[[1]]$y,
-                color = I(input$colFill),
+                # why I(inout$colFill)?
+                color = input$colFill,
+                line = list(color = input$colLine),
                 alpha = 0.01,
                 type = 'bar',
                 text = paste0(
                   # "range: (", round(aa$x$data[[1]]$x-aa$x$data[[1]]$width/2, 2), ", ",
                   # round(aa$x$data[[1]]$x+aa$x$data[[1]]$width/2, 2), "]", 
                   # "<br>frequency: ", aa$x$data[[1]]$y
-                  "lower bound: ", round(aa$x$data[[1]]$x-aa$x$data[[1]]$width/2, 2),
+                  "Bin #", which(aa$x$data[[1]]$x %in% aa$x$data[[1]]$x),
+                  "<br>lower bound: ", round(aa$x$data[[1]]$x-aa$x$data[[1]]$width/2, 2),
                   "<br>upper bound: ", round(aa$x$data[[1]]$x+aa$x$data[[1]]$width/2, 2),
                   "<br>frequency: ", aa$x$data[[1]]$y
                 ),
                 hoverinfo="text") %>%
+      {if(input$num1ShowMean){
+        add_segments(., x = meanX, xend = meanX, y = 0, yend = max(aa$x$data[[1]]$y),
+                     line = list(dash = "dash", color = 'deepskyblue'),
+                     showlegend = FALSE,
+                     hoverinfo = "text",
+                     text = ~paste("Mean: ",round(mean(df[,1],na.rm = TRUE),2), sep="")
+        )} else {.}
+      } %>% 
       layout(plot_bgcolor = input$colBackground, #'#e5ecf6',
+             # hoverlabel=list(bgcolor = I(input$colLine),
+             #                 font = list(color = input$colFill)),
              title = titleHist(),
              xaxis = list(
                title = xLabHist(),

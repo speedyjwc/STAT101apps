@@ -6,6 +6,16 @@ library(DT)
 library(colourpicker)
 library(plotly)
 library(shinyjs)
+library(shinyalert)
+
+# may be in a global.R
+link_hub <- tags$a(
+  shiny::icon("house", lib = "font-awesome"), 
+  "STAT101 Pages Hub",
+  href = "https://uocstats.shinyapps.io/0theHub_under_constuction",
+  target = "_blank"
+)
+
 
 # Define UI 
 shinyUI(
@@ -35,7 +45,7 @@ shinyUI(
                           text-decoration-color: green;
         }
         .sidebar{
-                  height: 600px; 
+                  height: 800px; 
                   overflow-y: auto;
         
         }
@@ -289,21 +299,6 @@ shinyUI(
                               ),
                               hr(),
                               em("All the upper bound of the bins are inclusive and all (except for the first bin) the lower bound of the bins are exclusive."),
-                              hr(),
-                              em("All the upper bound of the bins are inclusive and all (except for the first bin) the lower bound of the bins are exclusive."),
-                              hr(),
-                              em("All the upper bound of the bins are inclusive and all (except for the first bin) the lower bound of the bins are exclusive."),
-                              hr(),
-                              em("All the upper bound of the bins are inclusive and all (except for the first bin) the lower bound of the bins are exclusive."),
-                              hr(),
-                              em("All the upper bound of the bins are inclusive and all (except for the first bin) the lower bound of the bins are exclusive."),
-                              hr(),
-                              em("All the upper bound of the bins are inclusive and all (except for the first bin) the lower bound of the bins are exclusive."),
-                              hr(),
-                              em("All the upper bound of the bins are inclusive and all (except for the first bin) the lower bound of the bins are exclusive."),
-                              hr(),
-                              em("All the upper bound of the bins are inclusive and all (except for the first bin) the lower bound of the bins are exclusive."),
-                              
                               position = "right", 
                               open = TRUE),
                             layout_column_wrap(
@@ -383,9 +378,12 @@ shinyUI(
         nav_item(img(src="UoC.png", style="aspect-ratio: auto; max-height: 60px")),
         nav_menu(
           title = "Other sites",
+          nav_item(link_hub),
           nav_item("    Sampling"),
           nav_item("    Bootstrap"),
           nav_item("    Randomisation"),
+          nav_item("    Theoretical distribution"),
+          nav_item("    Explore Probability distributions"),
           nav_item("    ...")
         )
         

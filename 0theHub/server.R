@@ -39,6 +39,21 @@ shinyServer(function(input, output) {
   })
   
   ################################################### 
+  # generate bulletins with hyper links for temp incompleted stat101 sites
+  ###################################################   
+  output$LinksTemp <- renderUI({
+    d <- getRawApplications()
+    # print(d)
+    matches <-  grepl(d$name, pattern = "_temp", ignore.case = TRUE)
+    d <- d[matches,]
+    remove_stat <- substr(d$name,1,nchar(d$name)-8)
+    replace_ <- gsub("_", " ", remove_stat)
+    tags$ul(
+      HTML(paste0("<li><a href=\"", d$url, "\", target=\"_blank\">", replace_, "</a>", collapse = "</li>"))
+    )
+  })
+  
+  ################################################### 
   # generate bulletins with hyper links for uncompleted stat101 sites
   ###################################################
   # output$LinksNotComplete <- renderUI({

@@ -1,0 +1,13 @@
+name: 1plotGenerating_temp26062024
+title: 1plotGenerating_temp26062024
+username: uocstats
+account: uocstats
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 12235608
+bundleId: 8788583
+url: https://uocstats.shinyapps.io/1plotGenerating_temp26062024/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: HollywoodMovies.csv
